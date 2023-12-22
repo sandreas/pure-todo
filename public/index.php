@@ -1,65 +1,46 @@
 <?php
-/**
- * Todo
- * - Sort does not work... instead of index, use priority of the item that is replaced
- * - Enum for HttpMethods
- * - simple logging
- * - Error handling
- * - User-Details and Logout button!
- * - QRCode
- */
-
-/*
- * Font generation:
- *
- * - https://sonneiltech.com/2021/02/how-to-create-your-own-custom-icon-font/
- *
- * - icomoon app (https://icomoon.io/app/#/select)
- * - select icons to use
- * - generate font (bottom right)
- * - download font (bottom right)
- * - copy css contents into php file
- * - remove all src() from @font-face
- * - generate base64 from ttf font (pilabor.com/dev)
- * - paste base64 `src: url(data:font/ttf;base64,AAEAAAALAI...AAAAAA) format('truetype');`
- * - use icon: `<i class="icon-drag_indicator"></i>`
- */
-
 /**** START CONFIG ****/
-error_reporting(E_ALL);
-ini_set('display_errors', 'on');
-
+// $_ENV["DEBUG"] = true;
+$_ENV["TOKEN_SECRET"] ??= "<your-token-here>";
 $_ENV["DBFILE"] ??= __DIR__ . DIRECTORY_SEPARATOR . "/../data/todo.db";
 $_ENV["LOGFILE"] ??= __DIR__ . DIRECTORY_SEPARATOR . "/../data/perfmon.log";
-// $_ENV["PERFMON"] ??= "";
-$_ENV["TOKEN_SECRET"] ??= "GebCVhglvmqcu1dkJElAee0wTyIEzNVj";
+/**** END CONFIG ****/
+
+
 $_ENV["REQUEST_ID"] = sprintf("%08x", abs(crc32($_SERVER['REMOTE_ADDR'] . $_SERVER['REQUEST_TIME'] . $_SERVER['REMOTE_PORT'])));
 
+if ($_ENV["DEBUG"] ?? false) {
+    $_ENV["PERFMON"] ??= "";
+    error_reporting(E_ALL);
+    ini_set('display_errors', 'on');
+}
 
 
-function perfmon($marker) {
-    if(!isset($_ENV["PERFMON"])) {
+function perfmon($marker): void
+{
+    if (!isset($_ENV["PERFMON"])) {
         return;
     }
     static $start = 0;
     $end = microtime(true);
-    $duration = $start === 0 ? 0 : round(($end-$start) * 1000);
+    $duration = $start === 0 ? 0 : round(($end - $start) * 1000);
     $start = $end;
-    $_ENV["PERFMON"] .= str_pad($duration, 5, " ", STR_PAD_LEFT)."ms ".$_ENV["REQUEST_ID"]." ".$marker.PHP_EOL;
+    $_ENV["PERFMON"] .= str_pad($duration, 5, " ", STR_PAD_LEFT) . "ms " . $_ENV["REQUEST_ID"] . " " . $marker . PHP_EOL;
 }
 
-function perfmon_flush():void {
-    if(isset($_ENV["LOGFILE"], $_ENV["PERFMON"])) {
+function perfmon_flush(): void
+{
+    if (isset($_ENV["LOGFILE"], $_ENV["PERFMON"])) {
         file_put_contents($_ENV["LOGFILE"], $_ENV["PERFMON"], FILE_APPEND);
     }
 }
 
-register_shutdown_function(function(){
+register_shutdown_function(function () {
     perfmon('shutdown');
     perfmon_flush();
 });
 
-function dump(mixed...$variables):void
+function dump(mixed...$variables): void
 {
     echo "<pre>";
     foreach ($variables as $variable) {
@@ -69,7 +50,6 @@ function dump(mixed...$variables):void
     echo "</pre>";
     exit;
 }
-
 
 
 enum HttpStatusCode: int
@@ -124,7 +104,8 @@ class Jwt
         $this->secret = $secret;
     }
 
-    public static function generate($payload, $secret):string{
+    public static function generate($payload, $secret): string
+    {
         $signing_key = $secret;
         $header = [
             "alg" => static::HEADER_ALGO_NAME,
@@ -134,9 +115,8 @@ class Jwt
         $header = static::urlBase64Encode(json_encode($header));
         $payload = static::urlBase64Encode(json_encode($payload));
         $signature = static::urlBase64Encode(hash_hmac(static::HASH_ALGO_NAME, "$header.$payload", $signing_key, true));
-        return $header.".".$payload.".".$signature;
+        return $header . "." . $payload . "." . $signature;
     }
-
 
 
     public function isExpired(): bool
@@ -210,13 +190,14 @@ class JwtPayload implements JsonSerializable
         $this->admin = (bool)trim($properties["admin"] ?? "");
     }
 
-    public static function build(string $username, string $name, bool $isAdmin, int $expires = null):JwtPayload {
+    public static function build(string $username, string $name, bool $isAdmin, int $expires = null): JwtPayload
+    {
         return new static([
-           "exp" => $expires ?? (new DateTime("+10 years"))->getTimestamp(),
-           "sub" => $username,
-           "iss" => "pure-todo",
-           "name" => $name,
-           "admin" => $isAdmin
+            "exp" => $expires ?? (new DateTime("+10 years"))->getTimestamp(),
+            "sub" => $username,
+            "iss" => "pure-todo",
+            "name" => $name,
+            "admin" => $isAdmin
         ]);
     }
 
@@ -254,13 +235,13 @@ class TodoPdo extends PDO
     public function __construct(string $file, ?string $username = null, ?string $password = null, ?array $options = null)
     {
         $this->file = $file;
-        parent::__construct("sqlite:".$file, $username, $password, $options);
+        parent::__construct("sqlite:" . $file, $username, $password, $options);
         $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
-    public function createSchemaIfNotExists():void
+    public function createSchemaIfNotExists(): void
     {
-        if(file_exists($this->file) && filesize($this->file) > 0) {
+        if (file_exists($this->file) && filesize($this->file) > 0) {
             return;
         }
 
@@ -315,15 +296,16 @@ class TodoPdo extends PDO
             }
             $success = true;
         } finally {
-            if(!$success && file_exists($this->file)) {
+            if (!$success && file_exists($this->file)) {
                 unlink($this->file);
             }
         }
     }
 
-    public function preparedDebug($sql, $parameters = []):string {
-        foreach($parameters as $key => $value) {
-            $sql = str_replace(":".$key, "'".$value."'", $sql);
+    public function preparedDebug($sql, $parameters = []): string
+    {
+        foreach ($parameters as $key => $value) {
+            $sql = str_replace(":" . $key, "'" . $value . "'", $sql);
         }
         return $sql;
     }
@@ -368,7 +350,6 @@ try {
 } catch (Exception $e) {
     die($e);
 }
-
 
 
 interface IdentifierInterface
@@ -464,7 +445,7 @@ class TodoItem
     public BetterDateTime $modified;
     public BetterDateTime $prioritized;
 
-    public bool $priorityChanged= false;
+    public bool $priorityChanged = false;
 
     public function __construct($id, $listId, $title = "", $priority = 0, $finished = false)
     {
@@ -516,13 +497,14 @@ interface RepositoryInterface
     public function buildIdentifier(string...$primaryKeyFields): IdentifierInterface;
 
     public function createModelViaArray(array $properties): mixed;
-    public function updateModelViaArray(array $properties, ?IdentifierInterface $id=null): mixed;
+
+    public function updateModelViaArray(array $properties, ?IdentifierInterface $id = null): mixed;
 
     public function isAuthorizationRequired(): bool;
 
     public function adminRequired(): bool;
 
-    public function index(?IdentifierInterface $id=null, array $criteria=[]): array;
+    public function index(?IdentifierInterface $id = null, array $criteria = []): array;
 
     public function read(IdentifierInterface $id): mixed;
 
@@ -530,12 +512,13 @@ interface RepositoryInterface
 
     public function update(IdentifierInterface $id, $item): bool;
 
-    public function delete(IdentifierInterface $id, array $criteria=[]): bool;
+    public function delete(IdentifierInterface $id, array $criteria = []): bool;
 
     public function getMessage(): ?Message;
 }
 
-abstract class AbstractRepository implements RepositoryInterface {
+abstract class AbstractRepository implements RepositoryInterface
+{
     public function buildIdentifier(string ...$primaryKeyFields): IdentifierInterface
     {
         return new BasicIdentifier(...$primaryKeyFields);
@@ -570,7 +553,7 @@ class StatusRepository extends AbstractRepository
         return false;
     }
 
-    public function index(?IdentifierInterface $id=null, array $criteria = []): array
+    public function index(?IdentifierInterface $id = null, array $criteria = []): array
     {
         $status = $this->auth->getStatus();
         $user = $this->auth->getAuthenticatedUser();
@@ -597,7 +580,7 @@ class StatusRepository extends AbstractRepository
         return false;
     }
 
-    public function delete(IdentifierInterface $id, array $criteria=[]): bool
+    public function delete(IdentifierInterface $id, array $criteria = []): bool
     {
         return false;
     }
@@ -615,8 +598,8 @@ class StatusRepository extends AbstractRepository
 }
 
 
-
-class UserRepository extends AbstractRepository {
+class UserRepository extends AbstractRepository
+{
 
     private TodoPdo $db;
     private ?User $authenticatedUser;
@@ -633,7 +616,8 @@ class UserRepository extends AbstractRepository {
         $this->userCount = $this->countFiltered();
     }
 
-    public function setAuthenticatedUser(?User $authenticatedUser):void {
+    public function setAuthenticatedUser(?User $authenticatedUser): void
+    {
         $this->authenticatedUser = $authenticatedUser;
     }
 
@@ -641,40 +625,42 @@ class UserRepository extends AbstractRepository {
     {
         $user = new User((int)($properties["id"] ?? 0), $properties["username"] ?? "", $properties["name"] ?? "", (bool)($properties["admin"] ?? false), (bool)($properties["refreshToken"] ?? false));
 
-        if(isset($properties["token"])) {
+        if (isset($properties["token"])) {
             $user->token = $properties["token"];
         }
         return $user;
     }
 
-    public function countFiltered(array $criteria = []):int {
+    public function countFiltered(array $criteria = []): int
+    {
         $filter = new Filter($criteria);
-        $sql = "SELECT COUNT(1) as counter FROM todo_users".$filter->includeWhere();
+        $sql = "SELECT COUNT(1) as counter FROM todo_users" . $filter->includeWhere();
         try {
-            $st = $this->db->preparedExecute($sql,$filter->mergeParameters());
-            foreach($st as $record) {
+            $st = $this->db->preparedExecute($sql, $filter->mergeParameters());
+            foreach ($st as $record) {
                 return (int)($record["counter"] ?? 0);
             }
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             // ignore
         }
 
         return 0;
     }
 
-    public function queryOne(array $criteria = []):?User {
+    public function queryOne(array $criteria = []): ?User
+    {
         $filter = new Filter($criteria);
         $sql = "SELECT id, username, name, admin, token, created, modified 
-            FROM todo_users".$filter->includeWhere();
+            FROM todo_users" . $filter->includeWhere();
         $params = $filter->mergeParameters();
         try {
-            $st = $this->db->preparedExecute($sql,$params);
-            foreach($st as $record) {
+            $st = $this->db->preparedExecute($sql, $params);
+            foreach ($st as $record) {
 
                 return $this->createModelViaArray($record);
             }
 
-        } catch(Exception $e) {
+        } catch (Exception $e) {
         }
 
         return null;
@@ -684,17 +670,17 @@ class UserRepository extends AbstractRepository {
     {
         $model = $this->read($id);
 
-        if(isset($properties["username"])) {
+        if (isset($properties["username"])) {
             $model->username = $properties["username"];
         }
-        if(isset($properties["name"])) {
+        if (isset($properties["name"])) {
             $model->name = $properties["name"];
-        }        
-        if(isset($properties["admin"])) {
+        }
+        if (isset($properties["admin"])) {
             $model->admin = (bool)$properties["admin"];
         }
 
-        if(isset($properties["refreshToken"])) {
+        if (isset($properties["refreshToken"])) {
             $model->refreshToken = (bool)$properties["refreshToken"];
         }
 
@@ -711,18 +697,18 @@ class UserRepository extends AbstractRepository {
         return $this->userCount > 0;
     }
 
-    public function index(?IdentifierInterface $id=null, array $criteria = []): array
+    public function index(?IdentifierInterface $id = null, array $criteria = []): array
     {
         try {
             $sql = "SELECT id, username, name, admin, token FROM todo_users";
             $st = $this->db->preparedExecute($sql);
 
             $results = [];
-            foreach($st as $record) {
+            foreach ($st as $record) {
                 $results[] = $this->createModelViaArray($record);
             }
             return $results;
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -733,11 +719,11 @@ class UserRepository extends AbstractRepository {
             $sql = "SELECT id, username, name, admin, token FROM todo_users WHERE id = :id";
             $st = $this->db->preparedExecute($sql, ["id" => $id->id]);
 
-            foreach($st as $record) {
+            foreach ($st as $record) {
                 return $this->createModelViaArray($record);
             }
             return null;
-        }catch(Exception $e) {
+        } catch (Exception $e) {
         }
         return null;
 
@@ -783,7 +769,7 @@ class UserRepository extends AbstractRepository {
             $this->db->preparedExecute($sql, $params);
             $item->id = $this->db->lastInsertId();
             return true;
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -796,13 +782,13 @@ class UserRepository extends AbstractRepository {
     public function update(IdentifierInterface $id, $item): bool
     {
         // only admins can update users
-        if($this->authenticatedUser === null || $this->authenticatedUser->admin === false) {
+        if ($this->authenticatedUser === null || $this->authenticatedUser->admin === false) {
             return false;
         }
 
         try {
             // authenticated user cannot up- or downgrade his own admin permissions
-            if($this->authenticatedUser->id === $item->id  && $item->admin !== $this->authenticatedUser->admin) {
+            if ($this->authenticatedUser->id === $item->id && $item->admin !== $this->authenticatedUser->admin) {
                 return false;
             }
 
@@ -815,7 +801,7 @@ class UserRepository extends AbstractRepository {
                 "modify_user_id" => $this->authenticatedUser?->id
             ];
             $tokenPart = "";
-            if($item->refreshToken) {
+            if ($item->refreshToken) {
                 $buildToken = $this->buildToken;
                 $parameters["token"] = $buildToken($item->username, $item->name, $item->admin);
                 $tokenPart = "token = :token,";
@@ -827,29 +813,29 @@ class UserRepository extends AbstractRepository {
                 username = :username,
                 name = :name,
                 admin = :admin,
-                ".$tokenPart."
+                " . $tokenPart . "
                 modified = :modified,
                 modify_user_id = :modify_user_id         
             WHERE id = :id";
 
             $this->db->preparedExecute($sql, $parameters);
             return true;
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
 
-    public function delete(IdentifierInterface $id, array $criteria=[]): bool
+    public function delete(IdentifierInterface $id, array $criteria = []): bool
     {
         try {
             // users cannot delete themselves
-            if($this->authenticatedUser !== null && $this->authenticatedUser->id === $id->id) {
+            if ($this->authenticatedUser !== null && $this->authenticatedUser->id === $id->id) {
                 return false;
             }
             $sql = "DELETE FROM todo_users WHERE id = :id";
             $this->db->preparedExecute($sql, ["id" => $id->id]);
             return true;
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -872,20 +858,20 @@ class ListRepository extends AbstractRepository
     /**
      * @return TodoList[]
      */
-    public function index(?IdentifierInterface $id=null, array $criteria = []): array
+    public function index(?IdentifierInterface $id = null, array $criteria = []): array
     {
         try {
             $sql = "SELECT id, name, shared, created, modified FROM todo_lists WHERE create_user_id = :create_user_id OR shared = 1";
             $st = $this->db->preparedExecute($sql, [
-                    "create_user_id" => $this->userId
+                "create_user_id" => $this->userId
             ]);
 
             $results = [];
-            foreach($st as $record) {
+            foreach ($st as $record) {
                 $results[] = $this->createModelViaArray($record);
             }
             return $results;
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -897,11 +883,11 @@ class ListRepository extends AbstractRepository
             $sql = "SELECT name, shared, created, modified FROM todo_lists WHERE id = :id AND (create_user_id = :created_user_id OR shared = 1)";
             $st = $this->db->preparedExecute($sql, ["id" => $id->id, "create_user_id" => $this->userId]);
 
-            foreach($st as $record) {
+            foreach ($st as $record) {
                 return $this->createModelViaArray($record);
             }
             return null;
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return null;
         }
     }
@@ -932,31 +918,31 @@ class ListRepository extends AbstractRepository
                          :modify_user_id
                     )";
             $this->db->preparedExecute($sql, [
-                     "name" => $item->name,
-                     "shared" => $item->shared,
-                     "priority" => $item->priority,
-                     "created" => $item->created,
-                     "modified" => $item->modified,
-                     "prioritized" => $item->prioritized,
-                     "create_user_id" => $this->userId,
-                     "modify_user_id" => $this->userId
+                "name" => $item->name,
+                "shared" => $item->shared,
+                "priority" => $item->priority,
+                "created" => $item->created,
+                "modified" => $item->modified,
+                "prioritized" => $item->prioritized,
+                "create_user_id" => $this->userId,
+                "modify_user_id" => $this->userId
             ]);
             $item->id = $this->db->lastInsertId();
             return true;
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
 
 
-    function delete(IdentifierInterface $id, array $criteria=[]): bool
+    function delete(IdentifierInterface $id, array $criteria = []): bool
     {
         try {
             // user can only delete lists he created
             $sql = "DELETE FROM todo_lists WHERE id = :id AND create_user_id = :create_user_id";
             $this->db->preparedExecute($sql, ["id" => $id->id, "create_user_id" => $this->userId]);
             return true;
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -990,7 +976,7 @@ class ListRepository extends AbstractRepository
                 "create_user_id" => $this->userId
             ]);
             return true;
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -1007,24 +993,24 @@ class ListRepository extends AbstractRepository
 
     public function createModelViaArray(array $properties): mixed
     {
-        return new TodoList((int)($properties["id"] ?? 0), $properties["name"] ?? "", (bool)($properties["shared"]??false));
+        return new TodoList((int)($properties["id"] ?? 0), $properties["name"] ?? "", (bool)($properties["shared"] ?? false));
     }
 
     public function updateModelViaArray(array $properties, ?IdentifierInterface $id = null): mixed
     {
         $model = $this->read($id);
-        if(isset($properties["id"])) {
+        if (isset($properties["id"])) {
             $model->id = (int)$properties["id"];
         }
-        if(isset($properties["name"])) {
+        if (isset($properties["name"])) {
             $model->name = $properties["name"];
         }
-        if(isset($properties["shared"])) {
+        if (isset($properties["shared"])) {
             $model->shared = $properties["shared"];
         }
-        if(isset($properties["priority"])) {
+        if (isset($properties["priority"])) {
             $newPrio = (int)$properties["priority"];
-            if($newPrio != $model->priority) {
+            if ($newPrio != $model->priority) {
                 $model->prioritized = new BetterDateTime();
                 $model->priority = $newPrio;
             }
@@ -1034,35 +1020,40 @@ class ListRepository extends AbstractRepository
     }
 }
 
-class Filter {
+class Filter
+{
     private array $keyMapping = [];
     private array $keyValuePairs = [];
 
-    public function __construct(array $criteria = [], array $keyMapping=[])
+    public function __construct(array $criteria = [], array $keyMapping = [])
     {
-        foreach($criteria as $key => $value) {
+        foreach ($criteria as $key => $value) {
             $this->addParameter($key, $value);
         }
         $this->keyMapping = $keyMapping;
     }
 
-    private function mapKey($key):string {
-           return $this->keyMapping[$key] ?? $key;
+    private function mapKey($key): string
+    {
+        return $this->keyMapping[$key] ?? $key;
     }
 
-    private function mapKeys($keyValuePairs):array {
+    private function mapKeys($keyValuePairs): array
+    {
         $mapped = [];
-        foreach($keyValuePairs as $key => $value) {
+        foreach ($keyValuePairs as $key => $value) {
             $mapped[$this->mapKey($key)] = $value;
         }
         return $mapped;
     }
 
-    public function addParameter(string $key, mixed $value): void {
+    public function addParameter(string $key, mixed $value): void
+    {
         $this->keyValuePairs[$key] = $value;
     }
 
-    public function mergeParameters(array $parameters=[]):array {
+    public function mergeParameters(array $parameters = []): array
+    {
 
         return $this->mapKeys(array_merge($this->keyValuePairs, $parameters));
     }
@@ -1070,19 +1061,20 @@ class Filter {
     public function __toString(): string
     {
         $sql = "";
-        foreach($this->keyValuePairs as $key => $value) {
+        foreach ($this->keyValuePairs as $key => $value) {
             $mappedKey = $this->mapKey($key);
-            if($sql !== "") {
+            if ($sql !== "") {
                 $sql .= " AND ";
             }
-            $sql .= $mappedKey. " = :".$mappedKey;
+            $sql .= $mappedKey . " = :" . $mappedKey;
         }
         return $sql;
     }
 
-    public function includeWhere() {
+    public function includeWhere()
+    {
         $str = trim($this);
-        return $str === "" ? "" : " WHERE ".$str;
+        return $str === "" ? "" : " WHERE " . $str;
     }
 
 
@@ -1103,13 +1095,13 @@ class ItemRepository extends AbstractRepository
     }
 
 
-    function index(?IdentifierInterface $id=null, array $criteria = []): array
+    function index(?IdentifierInterface $id = null, array $criteria = []): array
     {
         try {
             $criteria = new Filter($criteria, static::KEY_MAPPING);
 
             $sql = "SELECT id, list_id, title, priority, finished, created, modified           FROM todo_items
-                    WHERE ".$criteria. " 
+                    WHERE " . $criteria . " 
                         -- ensure that user is allowed to access these items
                         AND (create_user_id = :create_user_id OR list_id IN (SELECT list_id FROM todo_lists WHERE shared = 1))
                     ORDER BY finished, priority DESC, modified DESC";
@@ -1119,11 +1111,11 @@ class ItemRepository extends AbstractRepository
             $parameters = $criteria->mergeParameters($fixedParams);
             $st = $this->db->preparedExecute($sql, $parameters);
             $results = [];
-            foreach($st as $record) {
+            foreach ($st as $record) {
                 $results[] = $this->createModelViaArray($record);
             }
             return $results;
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -1134,11 +1126,11 @@ class ItemRepository extends AbstractRepository
             $sql = "SELECT id, list_id, title, priority, finished, created, modified FROM todo_items WHERE id = :id AND (create_user_id = :create_user_id OR list_id IN (SELECT list_id FROM todo_lists WHERE shared = 1))";
             $st = $this->db->preparedExecute($sql, ["id" => $id->id, "create_user_id" => $this->userId]);
 
-            foreach($st as $record) {
+            foreach ($st as $record) {
                 return $this->createModelViaArray($record);
             }
             return null;
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return null;
         }
     }
@@ -1153,10 +1145,9 @@ class ItemRepository extends AbstractRepository
         try {
             $mappedUserId = $this->mapCreateUserIdForList($item->listId);
 
-            if($mappedUserId === 0) {
+            if ($mappedUserId === 0) {
                 return false;
             }
-
 
 
             // items will be created in the name of the list owner
@@ -1187,16 +1178,16 @@ class ItemRepository extends AbstractRepository
             ]);
             $item->id = $this->db->lastInsertId();
             return true;
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
 
 
-    function delete(IdentifierInterface $id, array $criteria=[]): bool
+    function delete(IdentifierInterface $id, array $criteria = []): bool
     {
         try {
-            if($id->id) {
+            if ($id->id) {
                 $criteria["id"] = $id->id;
             } else if (!isset($criteria["listId"])) {
                 // criteria MUST include either id or listId
@@ -1204,10 +1195,10 @@ class ItemRepository extends AbstractRepository
             }
             $filter = new Filter($criteria, static::KEY_MAPPING);
             // user cannot delete items created by others
-            $sql = "DELETE FROM todo_items".$filter->includeWhere()." AND (create_user_id = :create_user_id OR list_id IN (SELECT list_id FROM todo_lists WHERE shared = 1))";
+            $sql = "DELETE FROM todo_items" . $filter->includeWhere() . " AND (create_user_id = :create_user_id OR list_id IN (SELECT list_id FROM todo_lists WHERE shared = 1))";
             $this->db->preparedExecute($sql, $filter->mergeParameters());
             return true;
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -1222,14 +1213,14 @@ class ItemRepository extends AbstractRepository
         try {
             $priorityFixRequired = $this->isPriorityFixRequired($item);
             // problem: what if list_id has changed?
-            if(($priorityFixRequired || $item->priorityChanged) && !$this->updatePriorities($id, $item)) {
+            if (($priorityFixRequired || $item->priorityChanged) && !$this->updatePriorities($id, $item)) {
                 return false;
             }
 
 
             $userId = $this->mapCreateUserIdForList($item->listId);
             // no permission
-            if($userId === 0) {
+            if ($userId === 0) {
                 return false;
             }
             $sql = "UPDATE todo_items SET
@@ -1254,9 +1245,9 @@ class ItemRepository extends AbstractRepository
                 "create_user_id" => $this->userId,
             ];
             // die($this->db->preparedDebug($sql, $params));
-            $this->db->preparedExecute($sql,$params);
+            $this->db->preparedExecute($sql, $params);
             return true;
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -1264,9 +1255,9 @@ class ItemRepository extends AbstractRepository
     public function createModelViaArray(array $properties): ?TodoItem
     {
         return new TodoItem(
-                (int)($properties["id"] ?? 0),
+            (int)($properties["id"] ?? 0),
             (int)($properties["list_id"] ?? $properties["listId"] ?? 0),
-                    $properties["title"] ?? "",
+            $properties["title"] ?? "",
             (int)($properties["priority"] ?? 0),
             (bool)($properties["finished"] ?? false)
         );
@@ -1285,27 +1276,27 @@ class ItemRepository extends AbstractRepository
     public function updateModelViaArray(array $properties, ?IdentifierInterface $id = null): ?TodoItem
     {
         $model = $this->read($id);
-        if(isset($properties["id"])) {
+        if (isset($properties["id"])) {
             $model->id = (int)$properties["id"];
         }
 
-        if(isset($properties["listId"])) {
+        if (isset($properties["listId"])) {
             $model->listId = (int)$properties["listId"];
         }
 
-        if(isset($properties["title"])) {
+        if (isset($properties["title"])) {
             $model->title = $properties["title"];
         }
-        if(isset($properties["priority"])) {
+        if (isset($properties["priority"])) {
             $newPrio = (int)$properties["priority"];
 
-            if($model->priority !== $newPrio) {
+            if ($model->priority !== $newPrio) {
                 $model->priority = $newPrio;
                 $model->prioritized = new BetterDateTime();
                 $model->priorityChanged = true;
             }
         }
-        if(isset($properties["finished"])) {
+        if (isset($properties["finished"])) {
             $model->finished = (bool)$properties["finished"];
         }
         return $model;
@@ -1319,27 +1310,27 @@ class ItemRepository extends AbstractRepository
             $st = $this->db->preparedExecute($sql, [
                 "list_id" => $listId
             ]);
-            foreach($st as $record) {
+            foreach ($st as $record) {
                 $list = $record;
             }
-        } catch(Exception) {
+        } catch (Exception) {
             return 0;
         }
 
 
-        if($list === null) {
+        if ($list === null) {
             return 0;
         }
 
-        if($listId <= 0) {
+        if ($listId <= 0) {
             return 0;
         }
 
         $createUserId = (int)$list["create_user_id"];
-        if($createUserId === $this->userId) {
+        if ($createUserId === $this->userId) {
             return $this->userId;
         }
-        if($list["shared"]) {
+        if ($list["shared"]) {
             return $createUserId;
         }
         return 0;
@@ -1353,23 +1344,23 @@ class ItemRepository extends AbstractRepository
             $sql = "SELECT id, priority FROM todo_items WHERE id <> :id AND list_id = :list_id AND finished <> 1 ORDER BY priority DESC";
             $params = ["id" => $id->id, "list_id" => $item->listId];
             $st = $this->db->preparedExecute($sql, $params);
-            foreach($st as $record) {
+            foreach ($st as $record) {
                 $currentOrder[(int)$record["id"]] = (int)$record["priority"];
             }
 
-        } catch(Exception) {
+        } catch (Exception) {
             return false;
         }
         $ids = array_keys($currentOrder);
         $newOrder = [];
         $count = count($currentOrder);
-        for($i=$count;$i>0;$i--) {
+        for ($i = $count; $i > 0; $i--) {
             // skip current item prio value (updated later)
-            if($i === $item->priority) {
+            if ($i === $item->priority) {
                 continue;
             }
             $id = array_shift($ids);
-            if($id === null) {
+            if ($id === null) {
                 break;
             }
             $newOrder[$id] = $i;
@@ -1377,8 +1368,8 @@ class ItemRepository extends AbstractRepository
 
         $sql = "UPDATE todo_items SET priority = :priority WHERE id = :id";
         $sth = null;
-        foreach($newOrder as $id => $priority) {
-            if($currentOrder[$id] === $priority) {
+        foreach ($newOrder as $id => $priority) {
+            if ($currentOrder[$id] === $priority) {
                 continue;
             }
 
@@ -1399,10 +1390,10 @@ class ItemRepository extends AbstractRepository
         $sql = "SELECT COUNT(priority) as counter FROM todo_items WHERE list_id = :list_id GROUP BY priority ORDER BY counter DESC LIMIT 1;";
         try {
             $st = $this->db->preparedExecute($sql, ["list_id" => $item->listId]);
-            foreach($st as $record) {
+            foreach ($st as $record) {
                 return (int)$record["counter"] > 1;
             }
-        } catch(Exception) {
+        } catch (Exception) {
             // ignore
         }
         return true;
@@ -1462,7 +1453,7 @@ class AuthenticationHandler
             return JwtStatus::NoSub;
         }
 
-        if(null === $this->getAuthenticatedUser()) {
+        if (null === $this->getAuthenticatedUser()) {
             return JwtStatus::NotFound;
         }
         return JwtStatus::Ok;
@@ -1474,7 +1465,7 @@ class AuthenticationHandler
             return null;
         }
 
-        if($this->authenticatedUser === null) {
+        if ($this->authenticatedUser === null) {
             $this->authenticatedUser = $this->users->queryOne(["token" => $this->tokenAsString]);
         }
         return $this->authenticatedUser;
@@ -1502,7 +1493,7 @@ class Router
     public function handleRequest($server): bool
     {
         $method = $server["REQUEST_METHOD"] ?? "GET";
-        perfmon("router->handleRequest: ".$method);
+        perfmon("router->handleRequest: " . $method);
 
         if (!$this->isMethodAllowed($method)) {
             $this->sendResponse(HttpStatusCode::MethodNotAllowed);
@@ -1510,8 +1501,8 @@ class Router
         }
 
         $routeParts = $this->parseRoute($_SERVER["REQUEST_URI"], $urlParameters);
-        perfmon("routeParts: ".implode(",", $routeParts)." | queryString: ".json_encode($urlParameters));
-        if(!is_array($urlParameters)) {
+        perfmon("routeParts: " . implode(",", $routeParts) . " | queryString: " . json_encode($urlParameters));
+        if (!is_array($urlParameters)) {
             $urlParameters = [];
         }
         $criteria = $urlParameters["where"] ?? [];
@@ -1561,7 +1552,7 @@ class Router
         }
 
         $jsonInput = $this->readJsonInput();
-        perfmon("request data: ".json_encode($jsonInput));
+        perfmon("request data: " . json_encode($jsonInput));
         if ($method === "POST") {
             $model = $repository->createModelViaArray($jsonInput);
             if ($repository->create($model, $identifier)) {
@@ -1606,7 +1597,7 @@ class Router
     {
 
         $urlParts = explode("?", $requestUri);
-        if(isset($urlParts[1])) {
+        if (isset($urlParts[1])) {
             parse_str($urlParts[1], $urlParameters);
         }
         $pathParts = explode("/", trim($urlParts[0], "/"));
@@ -1630,7 +1621,7 @@ class Router
 
 perfmon('start');
 
-$userRepository = new UserRepository($db, function($username, $name, $admin): string {
+$userRepository = new UserRepository($db, function ($username, $name, $admin): string {
     $payload = JwtPayload::build($username, $name, $admin);
     return Jwt::generate($payload, $_ENV["TOKEN_SECRET"]);
 });
@@ -1646,8 +1637,7 @@ $router
     ->map("users", $userRepository)
     ->map("status", $statusRepository)
     ->map("lists", $listRepository)
-    ->map("items", $itemsRepository)
-    ;
+    ->map("items", $itemsRepository);
 
 
 if ($router->handleRequest($_SERVER)) {
@@ -1682,9 +1672,9 @@ if ($router->handleRequest($_SERVER)) {
     </style>
     <script>
         <?php
-        $css = glob(__DIR__."/js/*.js");
-        foreach($css as $file) {
-            echo file_get_contents($file).PHP_EOL;
+        $css = glob(__DIR__ . "/js/*.js");
+        foreach ($css as $file) {
+            echo file_get_contents($file) . PHP_EOL;
         }
         ?>
     </script>
@@ -1702,7 +1692,7 @@ if ($router->handleRequest($_SERVER)) {
         });
 
 
-        window.onhashchange = function() {
+        window.onhashchange = function () {
             initApp()
         };
     </script>

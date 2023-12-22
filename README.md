@@ -2,8 +2,40 @@
 pure-todo is a dead simple todo list application
 
 
+
+
 ## todo
 - Add filter / search option
+
+## notes
+```php
+/**
+ * Todo
+ * - Sort does not work... instead of index, use priority of the item that is replaced
+ * - Enum for HttpMethods
+ * - simple logging
+ * - Error handling
+ * - User-Details and Logout button!
+ * - QRCode
+ */
+
+/*
+ * Font generation:
+ *
+ * - https://sonneiltech.com/2021/02/how-to-create-your-own-custom-icon-font/
+ *
+ * - icomoon app (https://icomoon.io/app/#/select)
+ * - select icons to use
+ * - generate font (bottom right)
+ * - download font (bottom right)
+ * - copy css contents into php file
+ * - remove all src() from @font-face
+ * - generate base64 from ttf font (pilabor.com/dev)
+ * - paste base64 `src: url(data:font/ttf;base64,AAEAAAALAI...AAAAAA) format('truetype');`
+ * - use icon: `<i class="icon-drag_indicator"></i>`
+ */
+```
+
 
 ## Icons / Behaviour
 ### Todo
