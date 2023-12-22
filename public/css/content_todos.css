@@ -1,0 +1,20 @@
+#todos {
+    display:grid;
+    grid-template-rows: auto 1fr;
+}
+
+
+#items-done td.first, #items-done td.second {
+    text-decoration: line-through;
+}
+
+.open-items-container, .done-items-container {
+    margin-top:25px;
+}
+
+.done-head {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    place-items: center end;
+    padding-right:5px;
+}

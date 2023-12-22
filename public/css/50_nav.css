@@ -1,0 +1,35 @@
+
+#navigation {
+    position:fixed;bottom:0;left:0;right:0;
+    background: rgb(31, 31, 31);
+}
+
+#navigation-list {
+    list-style:none;display:grid;place-items:center center;grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+}
+
+#navigation-list li {
+    width:100%;
+}
+#navigation-list li a {
+    display:block;
+    text-align:center;
+    padding:10px 0;
+}
+#navigation-list li a i {
+    position:relative;
+    top:2px;
+    right:2px;
+}
+
+@media (orientation: portrait) {
+    #navigation-list {
+        font-size:2em;
+    }
+    #navigation-list a span {
+        display:none;
+    }
+}
+#navigation-list li.active {
+    border-top:2px solid rgb(221, 221, 221);
+}

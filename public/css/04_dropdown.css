@@ -1,0 +1,43 @@
+/* @formatter:off */
+/*
+.dropdown { display: inline-block; position: relative;}
+.dd-button {  display: inline-block;border: 1px solid rgb(128, 128, 128); border-radius: 4px; padding: 10px 20px;background-color: #ffffff; white-space: nowrap;}
+.dd-button.single-item {text-align:center;}
+.dd-button.multiple-items {cursor: pointer;padding: 10px 30px 10px 20px;}
+.dd-button.multiple-items:after { content: ''; position: absolute; top: 50%; right: 15px; transform: translateY(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid black; }
+
+
+.dd-button:hover { background-color: #eeeeee; }
+.dd-input { display: none; }
+.dd-menu { position: absolute; top: 100%; border: 1px solid #ccc; border-radius: 4px; padding: 0; margin: 2px 0 0 0; box-shadow: 0 0 6px 0 rgba(0,0,0,0.1); background-color: #ffffff; list-style-type: none; }
+.dd-input + .dd-menu { display: none; }
+.dd-input:checked + .dd-menu { display: block; }
+.dd-menu.show li { padding: 10px 20px; cursor: pointer; white-space: nowrap; }
+.dd-menu li:hover { background-color: #f6f6f6; }
+.dd-menu li a { display: block; margin: -10px -20px; padding: 10px 20px; }
+.dd-menu li.divider{ padding: 0; border-bottom: 1px solid #cccccc; }
+
+ */
+/* @formatter:on */
+
+
+.dropdown { display: block; position: relative;}
+.dd-button { display: block; border: 1px solid rgb(128, 128, 128); border-radius: 4px; padding: 10px 30px 10px 20px;background-color: rgb(31, 31, 31); cursor: pointer;white-space: nowrap;}
+
+.dd-button.single-item {text-align:center;}
+.dd-button.multiple-items {cursor: pointer;padding: 10px 30px 10px 20px;}
+.dd-button.multiple-items:after { content: ''; position: absolute; top: 50%; right: 15px; transform: translateY(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid rgb(227, 227, 227); }
+/*
+.dd-button:after { content: ''; position: absolute; top: 50%; right: 15px; transform: translateY(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid rgb(227, 227, 227); }*/
+.dd-button:hover { background-color: rgb(38, 38, 38); }
+.dd-input { display: none; }
+.dd-menu { width:100%;position: absolute; top: 100%; border: 1px solid #ccc; border-radius: 4px; padding: 0; margin: 2px 0 0 0; box-shadow: 0 0 6px 0 rgba(0,0,0,0.1); background-color: rgb(31, 31, 31); list-style-type: none; height:inherit;}
+.dd-input + .dd-menu { display: none; }
+.dd-input:checked + .dd-menu { display: block; }
+.dd-menu li { /*padding: 10px 20px; */ cursor: pointer; white-space: nowrap; }
+.dd-menu li:hover { background-color: rgb(38, 38, 38); }
+.dd-menu li a { padding:10px 0;display: block; /*margin: -10px -20px; padding: 10px 20px;*/ }
+.dd-menu li.divider{ padding: 0; border-bottom: 1px solid #cccccc; }
+/* @formatter:on */
+.dd-menu li.optgroup {font-weight:bold;cursor: auto;margin-left:10px;font-size:0.7em}
+.dd-menu li.optgroup:hover {background-color:transparent;}

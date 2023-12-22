@@ -1,0 +1,89 @@
+* {
+    /* disable double tap to zoom for ios safari */
+    touch-action: manipulation;
+}
+.icon-btn {
+    background:transparent;
+    /*border:0;*/
+    color: rgb(227, 227, 227);
+    margin:0;
+    padding:2px;
+    font-size:2rem;
+    border:1px dotted rgb(227,227,227);
+}
+#main {
+    display:grid;
+    grid-template-columns: auto 0.8fr auto;
+    padding-bottom:80px; /* for #navigation */
+}
+
+.content {
+    grid-column:2;
+    min-height: 60vh;
+}
+
+.route-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-gap: 20px;
+    place-items: center center;
+    font-size: 2.0rem;
+    justify-items:stretch;
+}
+
+.route-header h1 {
+    text-align: center;
+}
+
+p.description {
+    font-size:0.9rem;
+    margin-top:10px;
+}
+
+.index-table {
+    width:100%;
+    border-collapse: collapse;
+}
+.index-table td {
+    border-bottom:1px dotted silver;
+    padding:10px 0;
+}
+
+.index-table td.first, .index-table td.third {
+    width:50px;
+}
+
+.index-table td.third {
+    text-align:right;
+    padding-right:5px;
+}
+
+.icon-with-text i {
+    margin: 0 10px;
+}
+
+.form-group-text label, .form-group-password label {
+    display:block;
+    margin:10px 0 4px 0;
+    font-size:0.9rem;
+}
+
+.form-group-checkbox {
+    margin-top:10px;
+}
+
+.form-group-text input {
+    width:100%;
+    font-size:1.3rem;
+}
+
+.qr-container {
+    background:rgba(31,31,31,0.9);
+}
+
+.qr-bg img {background:#fff}
+
+/* todo: implement filter */
+.icon-filter_list_alt {
+    opacity:0;
+}
