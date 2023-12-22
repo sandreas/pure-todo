@@ -1,7 +1,7 @@
 <?php
 /**** START CONFIG ****/
 // $_ENV["DEBUG"] = true;
-$_ENV["TOKEN_SECRET"] ??= "<your-token-here>";
+$_ENV["TOKEN_SECRET"] ??= "<use-a-strong-token-secret-here>";
 $_ENV["DBFILE"] ??= __DIR__ . DIRECTORY_SEPARATOR . "/../data/todo.db";
 $_ENV["LOGFILE"] ??= __DIR__ . DIRECTORY_SEPARATOR . "/../data/perfmon.log";
 /**** END CONFIG ****/
