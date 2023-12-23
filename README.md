@@ -12,7 +12,10 @@ pure-todo is a dead simple todo list application. Its pretty new and unpolished,
 
 ## Screenshots
 <img src="doc/img/01_items.png" alt="Todo items" width="443" height="466" style="border:1px dotted white;margin:5px;"/>
+
 <details>
+  <summary style="font-size:2rem;">More screenshots</summary>
+
 <img src="doc/img/02_lists.png" alt="Todo lists" width="443" height="466" style="border:1px dotted white;margin:5px;"/>
 <img src="doc/img/03_users.png" alt="Users" width="443" height="466" style="border:1px dotted white;margin:5px;"/>
 <img src="doc/img/04_create_list.png" alt="Create list" width="443" height="466" style="border:1px dotted white;margin:5px;"/>
