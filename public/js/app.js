@@ -611,8 +611,8 @@ function renderItemTables() {
         var cleanupIcon =  renderButton('cleanup', 'delete_sweep'); // html("i", {class: 'icon-delete_sweep pointer', id: 'cleanup'});
         var finishedHead =
             html('div', {class: "done-head"},
-                html('h1', null, text('Done')),
-                cleanupIcon
+                cleanupIcon,
+                html('h1', null, text('Done'))
             );
         var finished = renderFinishedItems(finishedItems);
         var finishedContainer = html('div', {class: 'done-items-container'}, finishedHead, finished);
@@ -680,13 +680,13 @@ function renderFinishedItemRow(i) {
     });
     return html('tr',
         {class: "items-done-tr", 'data-item-id': i.id},
-        html('td',{class: "first uncheck"},
-            // html("i", {class: 'toggle-done icon-remove_done pointer'})
-            renderButton('toggle-done', 'remove_done')
+        html('td',{class: "first remove"},
+            deleteIcon
         ), // unmark icon
         html('td', {class: "second title"}, text(i.title)),
-        html('td', {class: "third remove"},
-            deleteIcon
+        html('td', {class: "third uncheck"},
+            // html("i", {class: 'toggle-done icon-remove_done pointer'})
+            renderButton('toggle-done', 'remove_done')
         )
     );
 }
