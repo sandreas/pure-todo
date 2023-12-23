@@ -11,18 +11,18 @@ pure-todo is a dead simple todo list application. Its pretty new and unpolished,
 - Designed for mobile and desktop devices
 
 ## Screenshots
-<img src="doc/img/01_items.png" alt="Todo items" width="443" height="466" style="border:1px dotted white;margin:5px;"/>
+<img src="doc/img/01_items.png" alt="Todo items" width="443" height="466" style="border:1px dotted white;margin:15px;"/>
 
 <details>
   <summary style="font-size:2rem;">More screenshots</summary>
 
-<img src="doc/img/02_lists.png" alt="Todo lists" width="443" height="466" style="border:1px dotted white;margin:5px;"/>
-<img src="doc/img/03_users.png" alt="Users" width="443" height="466" style="border:1px dotted white;margin:5px;"/>
-<img src="doc/img/04_create_list.png" alt="Create list" width="443" height="466" style="border:1px dotted white;margin:5px;"/>
-<img src="doc/img/05_create_user.png" alt="Create user" width="443" height="466" style="border:1px dotted white;margin:5px;"/>
-<img src="doc/img/06_setup.png" alt="Setup" width="443" height="466" style="border:1px dotted white;margin:5px;"/>
+<img src="doc/img/02_lists.png" alt="Todo lists" width="443" height="466" style="border:1px dotted white;margin:15px;"/>
+<img src="doc/img/03_users.png" alt="Users" width="443" height="466" style="border:1px dotted white;margin:15px;"/>
+<img src="doc/img/04_create_list.png" alt="Create list" width="443" height="466" style="border:1px dotted white;margin:15px;"/>
+<img src="doc/img/05_create_user.png" alt="Create user" width="443" height="466" style="border:1px dotted white;margin:15px;"/>
+<img src="doc/img/06_setup.png" alt="Setup" width="443" height="466" style="border:1px dotted white;margin:15px;"/>
 
-<img src="doc/img/07_qrcode.png" alt="QR Code" width="443" height="466" style="border:1px dotted white;margin:5px;"/>
+<img src="doc/img/07_qrcode.png" alt="QR Code" width="443" height="466" style="border:1px dotted white;margin:15px;"/>
 </details>
 
 
