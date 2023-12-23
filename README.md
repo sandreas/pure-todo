@@ -6,6 +6,7 @@ pure-todo is a dead simple todo list application. Its pretty new and unpolished,
 - REST API available (undocumented ATM)
 - User Management with permissions
 - Create private and shared lists
+- Drag & Drop reordering
 - Token-Based login with QR Code support
 - Designed for mobile and desktop devices
 
