@@ -250,7 +250,8 @@ class TodoPdo extends PDO
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username INTEGER NOT NULL UNIQUE,
         name TEXT NOT NULL,
-        admin INTEGER NOT NULL,
+        admin INTEGER DEFAULT 0 NOT NULL,
+        disabled INTEGER DEFAULT 0 NOT NULL,
         token TEXT NOT NULL,
         created TEXT NOT NULL,
         modified TEXT NOT NULL,
@@ -375,6 +376,7 @@ class User
     public string $username = "";
     public string $name = "";
     public bool $admin = false;
+    public bool $disabled = false;
     public string $token = "";
 
     public bool $refreshToken = false;

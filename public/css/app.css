@@ -3,6 +3,7 @@
     touch-action: manipulation;
 }
 .icon-btn {
+    cursor:pointer;
     background:transparent;
     /*border:0;*/
     color: rgb(227, 227, 227);
