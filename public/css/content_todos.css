@@ -1,6 +1,6 @@
 #todos {
     display:grid;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto 1fr;
 }
 
 
@@ -20,3 +20,4 @@
 .done-head h1 {
     padding-right:2vw;
 }
+

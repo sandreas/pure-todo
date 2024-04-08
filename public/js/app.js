@@ -603,11 +603,14 @@ function renderItemTables() {
             )
         );
     } else {
-        var openItems = items.filter(i => !i.finished);
+        var searchTerm = id('todos-filter-query').value.toLowerCase();
+        var allItems = window.items.filter( i => i.title.toLowerCase().indexOf(searchTerm) !== -1);
+
+        var openItems = allItems.filter(i => !i.finished);
         var open = renderOpenItems(openItems);
         var openContainer = html('div', {class: 'open-items-container'}, open);
 
-        var finishedItems = window.items.filter(i => i.finished);
+        var finishedItems = allItems.filter(i => i.finished);
         var cleanupIcon =  renderButton('cleanup', 'delete_sweep'); // html("i", {class: 'icon-delete_sweep pointer', id: 'cleanup'});
         var finishedHead =
             html('div', {class: "done-head"},
@@ -1112,3 +1115,4 @@ function replaceContent(el, child) {
 function patchItem(itemId, data) {
     return patch("items/" + itemId, data);
 }
+

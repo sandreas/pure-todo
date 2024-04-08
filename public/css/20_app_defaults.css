@@ -7,6 +7,7 @@ body {
     font-size:16pt;
 }
 
+
 /* unvisited link */
 a {
     font-family: Arial, sans-serif;
@@ -46,4 +47,12 @@ label {
 h1, .todos-header-lists-selection {
     font-size:1.8rem;
     margin-top:25px;
+}
+
+input[type=text], input[type=search]{
+    border: 1px solid rgb(128, 128, 128);
+    border-radius: 4px;
+    padding: 2px;
+    background-color: rgb(31, 31, 31);
+    color: rgb(227, 227, 227);
 }
