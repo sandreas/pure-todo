@@ -1714,7 +1714,7 @@ if ($router->handleRequest($_SERVER)) {
             <a href="#!/todos/new"><i id="btn-create-item" class="icon-add_task"></i></a>
         </div>
         <div id="todos-filter">
-            <i></i>
+            <i id="btn-add-from-new" class="icon-add_task" onclick="changeLocation('todo', 'new', null, {title:document.getElementById('todos-filter-query').value})"></i>
             <label for="todos-filter-query">
                 <input placeholder="Filter" type="search" value="" id="todos-filter-query" oninput="renderItemTables()"/>
             </label>

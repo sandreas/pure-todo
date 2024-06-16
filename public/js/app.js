@@ -56,8 +56,9 @@ function redirectTo(entity, selection, identifier) {
     }
 }
 
-function changeLocation(entity, selection, identifier) {
-    location.href = buildHref(entity, selection, identifier);
+function changeLocation(entity, selection, identifier, params) {
+    params = params || {};
+    location.href = buildHref(entity, selection, identifier, params);
 }
 
 function defaultSettings() {
@@ -71,11 +72,22 @@ function resetSettings() {
     saveSettings();
 }
 function parseRoute() {
-    var parts = location.hash.replace(/^[/#!]+/, '').replace(/[/#!]+$/, '').split('/').filter(p => p.trim() !== "");
+    var hash = location.hash.replace(/^[/#!]+/, '').replace(/[/#!]+$/, '');
+
+    var qsplit = hash.split("?");
+
+    var params = null;
+    if(qsplit.length > 1) {
+        var urlSearchParams = new URLSearchParams(qsplit[1]);
+        params = Object.fromEntries(urlSearchParams.entries());
+    }
+
+    var parts = qsplit[0].split('/').filter(p => p.trim() !== "");
     window.route = {
         entity: parts.shift() || "todos",
         selection: parts.shift() || "",
-        identifier: parts.shift() || ""
+        identifier: parts.shift() || "",
+        params: params
     }
 }
 
@@ -141,9 +153,8 @@ function activateNav() {
 }
 function renderTodos() {
     prepareRouteRender();
-
     if(route.selection === "new") {
-        renderItemForm();
+        renderItemForm(route.params);
         return;
     }
 
@@ -563,7 +574,7 @@ function buildListSelectionLink(listItem) {
     return html('a', {href: buildHref('todos', 'list', listItem.id)}, buildListName(listItem));
 }
 
-function buildHref(entity, selection, identifier) {
+function buildHref(entity, selection, identifier, params) {
     var href = '/#!/'+entity;
     if(arguments.length > 1 && selection !== null && selection !== undefined && selection !== "") {
         href += '/'+selection;
@@ -571,6 +582,13 @@ function buildHref(entity, selection, identifier) {
     if(arguments.length > 2 && identifier !== null && identifier !== undefined && identifier !== "") {
         href += '/'+identifier;
     }
+
+    if(arguments.length > 3) {
+        params = params || {};
+        var searchParams = new URLSearchParams(params);
+        href += "?"+searchParams;
+    }
+
     return href;
 }
 

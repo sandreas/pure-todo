@@ -115,9 +115,6 @@ p.description {
     height:100px;
 }
 
-#btn-clear-search {
-    display:none;
-}
 /* firefox only */
 @-moz-document url-prefix() {
     #btn-clear-search {
