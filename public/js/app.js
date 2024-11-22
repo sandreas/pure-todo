@@ -611,6 +611,8 @@ function loadItems() {
 
 function renderItemTables() {
     setClass(id('todos-content'), 'center', items.length === 0)
+    var filterNewButton = id('btn-add-from-new');
+    hide(filterNewButton);
     if(items.length === 0) {
         replaceIdContent('todos-content',
             html('div', null,
@@ -621,10 +623,14 @@ function renderItemTables() {
             )
         );
     } else {
+        // hide(filterNewButton);
         var searchTerm = id('todos-filter-query').value.toLowerCase();
         var allItems = window.items.filter( i => i.title.toLowerCase().indexOf(searchTerm) !== -1);
 
         var openItems = allItems.filter(i => !i.finished);
+        if(openItems.length === 0) {
+            show(filterNewButton);
+        }
         var open = renderOpenItems(openItems);
         var openContainer = html('div', {class: 'open-items-container'}, open);
 

@@ -7,6 +7,16 @@ $_ENV["LOGFILE"] ??= __DIR__ . DIRECTORY_SEPARATOR . "/../data/perfmon.log";
 /**** END CONFIG ****/
 
 
+// requested file
+$requestedFile = realpath("public".$_SERVER["REQUEST_URI"]);
+
+if ($requestedFile && str_starts_with($requestedFile,__DIR__) && str_ends_with($requestedFile, "sw.js") && file_exists($requestedFile)) {
+
+    header("Content-Type: application/javascript; charset=UTF-8");
+       readfile($requestedFile);
+       exit;
+}
+
 $_ENV["REQUEST_ID"] = sprintf("%08x", abs(crc32($_SERVER['REMOTE_ADDR'] . $_SERVER['REQUEST_TIME'] . $_SERVER['REMOTE_PORT'])));
 
 if ($_ENV["DEBUG"] ?? false) {
@@ -1506,6 +1516,7 @@ class Router
         }
 
         $routeParts = $this->parseRoute($_SERVER["REQUEST_URI"], $urlParameters);
+
         perfmon("routeParts: ".implode(",", $routeParts)." | queryString: ".json_encode($urlParameters));
         if(!is_array($urlParameters)) {
             $urlParameters = [];
@@ -1657,6 +1668,7 @@ if ($router->handleRequest($_SERVER)) {
     <?php /* <meta name="viewport" content="width=device-width, initial-scale=1.0"> */ ?>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>pure todo</title>
+    <link rel="manifest" href="app.webmanifest">
     <?php /*
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/icons.css">
@@ -1692,14 +1704,59 @@ if ($router->handleRequest($_SERVER)) {
         window.items = [];
         window.users = [];
 
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker
+                .register('pwa/sw.js')
+                .then(() => { console.log('Service Worker Registered'); });
+        }
+
+        /*
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            alert("go");
+        });
+        */
         document.addEventListener("DOMContentLoaded", function (/* e */) {
             initApp();
+
+            var deferredPrompt;
+            var addBtn = document.querySelector('.add-button');
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                console.log("something");
+                // Prevent Chrome 67 and earlier from automatically showing the prompt
+                e.preventDefault();
+                // Stash the event so it can be triggered later.
+                deferredPrompt = e;
+                // Update UI to notify the user they can add to home screen
+                addBtn.style.display = 'block';
+
+                addBtn.addEventListener('click', () => {
+                    // hide our user interface that shows our A2HS button
+                    addBtn.style.display = 'none';
+                    // Show the prompt
+                    deferredPrompt.prompt();
+                    // Wait for the user to respond to the prompt
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('User accepted the A2HS prompt');
+                        } else {
+                            console.log('User dismissed the A2HS prompt');
+                        }
+                        deferredPrompt = null;
+                    });
+                });
+            });
+
         });
 
 
         window.onhashchange = function () {
             initApp()
         };
+
+
     </script>
 
 </head>
@@ -1709,12 +1766,12 @@ if ($router->handleRequest($_SERVER)) {
 <main id="main">
     <div id="todos" class="content hidden">
         <div id="todos-header" class="route-header">
-            <i class="icon-filter_list_alt"></i>
+            <i><button class="add-button" style="border:0;margin:0;padding:4px;background:transparent;font-size:0.75em;cursor:pointer;">🐶</button></i>
             <div id="todos-header-lists-selection"></div>
             <a href="#!/todos/new"><i id="btn-create-item" class="icon-add_task"></i></a>
         </div>
         <div id="todos-filter">
-            <i id="btn-add-from-new" class="icon-add_task" onclick="changeLocation('todo', 'new', null, {title:document.getElementById('todos-filter-query').value})"></i>
+            <span><i id="btn-add-from-new" class="icon-add_task" onclick="changeLocation('todo', 'new', null, {title:document.getElementById('todos-filter-query').value})"></i></span>
             <label for="todos-filter-query">
                 <input placeholder="Filter" type="search" value="" id="todos-filter-query" oninput="renderItemTables()"/>
             </label>

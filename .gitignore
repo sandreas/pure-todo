@@ -1,4 +1,5 @@
 .idea/
 .credentials
+.experimental/
 data/
 !data/.gitkeep
