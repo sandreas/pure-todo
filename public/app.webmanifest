@@ -1,7 +1,7 @@
 {
    "name": "pure todo",
    "short_name": "ptodo",
-   "scope": "https://todo.pilabor.com/",
+   "scope": "<scope>",
    "start_url":"/?standalone=1",
    "display": "standalone",
    "icons": [
