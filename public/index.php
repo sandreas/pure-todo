@@ -1780,10 +1780,10 @@ if ($router->handleRequest($_SERVER)) {
         <div id="todos-header" class="route-header">
             <i><button class="add-button" style="border:0;margin:0;padding:4px;background:transparent;font-size:0.75em;cursor:pointer;">🐶</button></i>
             <div id="todos-header-lists-selection"></div>
-            <a href="#!/todos/new"><i id="btn-create-item" class="icon-add_task"></i></a>
+            <a href="javascript:changeLocation('todo', 'new', null, {title:document.getElementById('todos-filter-query').value})"><i class="icon-add_task"></i></a>
         </div>
         <div id="todos-filter">
-            <span><i id="btn-add-from-new" class="icon-add_task" onclick="changeLocation('todo', 'new', null, {title:document.getElementById('todos-filter-query').value})"></i></span>
+            <span></span>
             <label for="todos-filter-query">
                 <input placeholder="Filter" type="search" value="" id="todos-filter-query" oninput="renderItemTables()"/>
             </label>
@@ -1799,7 +1799,7 @@ if ($router->handleRequest($_SERVER)) {
         <div id="lists-header" class="route-header">
             <i class="icon-filter_list_alt"></i>
             <h1>Lists</h1>
-            <a href="#!/lists/new"><i id="btn-create-item" class="icon-post_add"></i></a>
+            <a href="#!/lists/new"><i class="icon-post_add"></i></a>
         </div>
         <div id="lists-content">
 
@@ -1809,7 +1809,7 @@ if ($router->handleRequest($_SERVER)) {
         <div id="users-header" class="route-header">
             <i class="icon-filter_list_alt"></i>
             <h1>Users</h1>
-            <a href="#!/users/new"><i id="btn-create-item" class="icon-person_add_alt_1"></i></a>
+            <a href="#!/users/new"><i class="icon-person_add_alt_1"></i></a>
         </div>
         <div id="users-content">
 
