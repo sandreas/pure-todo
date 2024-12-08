@@ -1667,12 +1667,11 @@ if ($router->handleRequest($_SERVER)) {
     <meta charset="utf-8">
     <?php /* <meta name="viewport" content="width=device-width, initial-scale=1.0"> */ ?>
     <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> -->
-    <meta name="viewport" content="width=device-width; initial-scale=1; viewport-fit=cover">
 
 
     <title>pure todo</title>
     <link rel="manifest" href="app.webmanifest">
-
+    <meta name="viewport" content="width=device-width; initial-scale=1; viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
 
@@ -1734,6 +1733,18 @@ if ($router->handleRequest($_SERVER)) {
 
             var deferredPrompt;
             var addBtn = document.querySelector('.add-button');
+
+            try {
+                var isStandalone = navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+                if(isStandalone) {
+                    // use visibility (not display) to keep element space intact
+                    addBtn.style.visibility = "hidden";
+                }
+            } catch(e) {
+                console.warn(e);
+            }
+
+
 
             window.addEventListener('beforeinstallprompt', (e) => {
                 console.log("something");

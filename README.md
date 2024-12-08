@@ -35,84 +35,13 @@ The setup is pretty simple:
 - Create a (sub-) domain pointing to `public` as main directory
   - depending on your webserver, you need to add a rewrite rule to write every request to `index.php`
 
+## Usage
 
+After pure-todo is running, you can create lists (private or shared), add users and manage your todo items. It's more or less self explanatory. 
+However, there are some minor things that are useful to know.
 
-## todo
-
-### Features
-- Globally
-  - Add filter / search option (button to blend in, input with no result may show button to create new?)
-  - Export / Import data
-- Items
-  - Switch places for buttons in `Done` lists (Uncheck right, Delete and cleanup left)
-- Lists
-  - Edit option
-  - show status (shared, private) in listing
-  - Prioritize via drag indicator
-- Users
-  - Edit user
-  - Disable user (possibly change `admin` field to `flags` and store all bits in one integer)
-  
-### Technical
-
-- Enum for HttpMethods
-- better Error handling
-
-## Howto build custom icon font
-Basic tutorial: https://sonneiltech.com/2021/02/how-to-create-your-own-custom-icon-fon
-
-- open icomoon app (https://icomoon.io/app/#/select)
-- select icons to use
-- generate font (bottom right)
-- download font (bottom right)
-- copy css contents into php file
-- remove all src() from @font-face
-- generate base64 from ttf font (https://pilabor.com/dev)
-- paste base64 `src: url(data:font/ttf;base64,AAEAAAALAI...AAAAAA) format('truetype');`
-- use icon: `<i class="icon-drag_indicator"></i>`
-
-
-
-## Icons / Behaviour
-### Todo
-- Header
-  - filter / search: filter_list_alt, search
-  - list dropdown: arrow_drop_down
-  - add: add_task, add_circle_outline
-- Content Todo
-  - order via drag: drag_indicator
-  - title: no icon, double tap to edit
-  - finish: check_circle, check_circle_outline
-  - caption bottom: done_all => mark all as done
-- Content done (do I need the headline `Done` or is it enough to strike content and margin)
-  - cleanup: delete_sweep
-  - uncheck: remove_done
-
-### Lists
-- General
-  - shared: connect_without_contact
-  - private: lock_outline
-- Header
-  - `Lists` as headline
-  - add: post_add
-- Content
-  - order via drag: drag_indicator
-  - title: no icon, double tap to edit
-  - edit: create (optional? maybe edit form has a delete button?)
-  - delete: delete
-
-### Users
-- Header
-    - `Users` as headline
-    - add: person_add_alt_1
-- Content
-    - Name: no icon, double tap to edit
-    - edit: create (optional? maybe edit form has a delete button?)
-    - delete: delete
-
-
-### Navigation
-- todo: check
-- list: format_list_bulleted
-- user: person
-- logout: logout
+- pure-todo can be installed and used as PWA, so it looks and acts like a native App. Click on the dog icon on the left to use PWA mode
+- You can reorder items by holding the move icon in front of every item. If you'd like to give top prio, double tap, for lowest use triple tap
+- Deleting users or lists is not implemented yet - mainly because I did not need it. Feel free to submit a PR
+  - pure-todo is based on sqlite, so if you would like to change data manually, all it takes is change / delete the data manually the sqlite database
+  - to backup pure-todo items, backup the database file and the token
